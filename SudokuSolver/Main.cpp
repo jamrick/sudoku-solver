@@ -12,8 +12,9 @@
 
 int main()
 {
-	Sudoku sudokuSolver;
-	sudokuSolver.LoadSudoku("SudokuTest.txt");
+	SudokuSolver sudokuSolver;
+	sudokuSolver.LoadSudokuLevel("SudokuTest.txt");
+	sudokuSolver.PrintSudokuLevel();
 
 #if BENCHMARKING	// benchmarking code, strickly timing the length of time to find the solution
 	jhTimer jt;
