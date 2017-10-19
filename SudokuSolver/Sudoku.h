@@ -18,6 +18,7 @@ private:
 		Cell();
 		void CompleteCell(int n);
 		void ResetCell();
+		bool RemovePossible(int n);
 	};
 
 public:
@@ -27,10 +28,10 @@ public:
 	void ResetCells();
 	void PrintSudokuLevel() const;
 	bool CompleteSudoku() const;
+	void RemoveExisting(int row, int col);
 
 private:
 	Cell SudokuLevel[9][9];
-	int nRemaining;
 };
 
 #endif

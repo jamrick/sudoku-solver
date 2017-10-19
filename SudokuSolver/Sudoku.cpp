@@ -32,6 +32,18 @@ void SudokuSolver::Cell::ResetCell()
 		nvPossible.Append(i);
 	}
 }
+bool SudokuSolver::Cell::RemovePossible(int n)
+{
+	for (int i = 0; i < nvPossible.Size(); ++i)
+	{
+		if (nvPossible[i] == n)
+		{
+			nvPossible.Remove(i);
+			return true;
+		}
+	}
+	return false;
+}
 
 
 // sudokusolver class method definitions
@@ -58,10 +70,6 @@ void SudokuSolver::LoadSudokuLevel(const char* fileName)
 					continue;
 
 				SudokuLevel[r][c++].CompleteCell((int)(in - '0'));
-				if (SudokuLevel[r][c - 1].nVal != 0)
-				{
-					--nRemaining;
-				}
 
 				if (c == 9)
 				{
@@ -73,13 +81,13 @@ void SudokuSolver::LoadSudokuLevel(const char* fileName)
 		}
 
 		// level is loaded, take out exisitng values
-		//for (int startRow = 1; startRow < 9; startRow += 3)
-		//{
-		//	for (int startCol = 1; startCol < 9; startCol += 3)
-		//	{
-		//		RemoveExisting(startRow, startCol);
-		//	}
-		//}
+		for (int startRow = 1; startRow < 9; startRow += 3)
+		{
+			for (int startCol = 1; startCol < 9; startCol += 3)
+			{
+				RemoveExisting(startRow, startCol);
+			}
+		}
 	}
 }
 void SudokuSolver::ResetCells()
@@ -87,8 +95,6 @@ void SudokuSolver::ResetCells()
 	for (int r = 0; r < 9; r++)
 		for (int c = 0; c < 9; c++)
 			SudokuLevel[r][c].ResetCell();
-
-	nRemaining = 81;
 }
 void SudokuSolver::PrintSudokuLevel() const
 {
@@ -115,5 +121,41 @@ void SudokuSolver::PrintSudokuLevel() const
 }
 bool SudokuSolver::CompleteSudoku() const
 {
-	return nRemaining == 0;
+	for (int i = 0; i < 9; ++i)
+		for (int j = 0; j < 9; ++j)
+		{
+			if (SudokuLevel[i][j].nVal == 0)
+				return false;
+		}
+	return true;
+}
+void SudokuSolver::RemoveExisting(int row, int col)
+{
+	int adjRow1 = row - 1, adjRow2 = row + 1;
+	int adjCol1 = col - 1, adjCol2 = col + 1;
+
+	for (int r = adjRow1; r <= adjRow2; ++r)
+	{
+		for (int c = adjCol1; c <= adjCol2; ++c)
+		{
+			// remove the val from the other possible numbers 
+			for (int i = 0; i < 9; ++i)
+			{
+				// row
+				SudokuLevel[r][i].RemovePossible(SudokuLevel[r][c].nVal);
+				// col
+				SudokuLevel[i][c].RemovePossible(SudokuLevel[r][c].nVal);
+			}
+
+			for (int r2 = adjRow1; r2 <= adjRow2; ++r2)
+			{
+				for (int c2 = adjCol1; c2 <= adjCol2; ++c2)
+				{
+					if (c == c2 && r == r2)
+						continue;
+					SudokuLevel[r][c].RemovePossible(SudokuLevel[r2][c2].nVal);
+				}
+			}
+		}
+	}
 }
