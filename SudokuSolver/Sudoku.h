@@ -26,10 +26,12 @@ public:
 	
 	void LoadSudokuLevel(const char* fileName);
 	void ResetCells();
-	void PrintSudokuLevel() const;
+	void Print() const;
 	bool CompleteSudoku() const;
 	void RemoveExisting(int row, int col);
-
+	void Solve();
+	void Update();
+	void CheckPossible(int row, int col);
 private:
 	Cell SudokuLevel[9][9];
 };
