@@ -32,6 +32,8 @@ public:
 	void Solve();
 	void Update();
 	void CheckPossible(int row, int col);
+	void CheckPossibleRow(int row, int col);
+	void CheckPossibleCol(int row, int col);
 private:
 	Cell SudokuLevel[9][9];
 };

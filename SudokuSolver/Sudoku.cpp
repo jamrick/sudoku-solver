@@ -179,9 +179,10 @@ void SudokuSolver::Update()
 	for (int startRow = 1; startRow < 9; startRow += 3)
 	{
 		for (int startCol = 1; startCol < 9; startCol += 3)
-		{			
+		{
 			RemoveExisting(startRow, startCol);
-			CheckPossible(startRow, startCol);
+			CheckPossibleRow(startRow, startCol);
+			CheckPossibleCol(startRow, startCol);
 		}
 	}
 }
@@ -191,46 +192,47 @@ void SudokuSolver::CheckPossible(int row, int col)
 	int adjRow1 = row - 1, adjRow2 = row + 1;
 	int adjCol1 = col - 1, adjCol2 = col + 1;
 
+	//bool found = true;
 	for (int r = adjRow1; r <= adjRow2; ++r)
 	{
 		for (int c = adjCol1; c <= adjCol2; ++c)
 		{
-			// remove the val from the other possible numbers 
-			for (int pos = 0; pos < SudokuLevel[r][c].nvPossible.Size(); ++pos)
-			{
-				
-				//bool skip = false;
-				for (int i = 0; i < 9/* && found == false*/; ++i)
-				{
-					if (i == c)
-						continue;
+			//// remove the val from the other possible numbers 
+			//for (int pos = 0; pos < SudokuLevel[r][c].nvPossible.Size(); ++pos)
+			//{
+			//	
+			//	//bool skip = false;
+			//	for (int i = 0; i < 9/* && found == false*/; ++i)
+			//	{
+			//		if (i == c)
+			//			continue;
 
-					bool found = true;
-					//// row
-					for (int rows = 0; rows < SudokuLevel[r][i].nvPossible.Size() && found == false; ++rows)
-					{
-						found = false;
-						//if (i == c)
-						//{
-						//	//skip = true;
-						//	found = true;
-						//	break;
-						//}
-						found = SudokuLevel[r][c].nvPossible[pos] == SudokuLevel[r][i].nvPossible[rows]/* || SudokuLevel[r][c].nvPossible[pos] == SudokuLevel[r][i].nVal*/;
-					}
-					if (found == false/* && skip == false*/)
-					{
-						SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[pos]);
-						break;
-					}
-					else
-						continue;
-					//else if (skip == true)
-					//{
-					//	skip = false;
-					//	//continue;
-					//}
-				}
+			//		
+			//		//// row
+			//		for (int rows = 0; rows < SudokuLevel[r][i].nvPossible.Size() && found == false; ++rows)
+			//		{
+			//			found = false;
+			//			//if (i == c)
+			//			//{
+			//			//	//skip = true;
+			//			//	found = true;
+			//			//	break;
+			//			//}
+			//			found = SudokuLevel[r][c].nvPossible[pos] == SudokuLevel[r][i].nvPossible[rows]/* || SudokuLevel[r][c].nvPossible[pos] == SudokuLevel[r][i].nVal*/;
+			//		}
+			//		if (found == false/* && skip == false*/)
+			//		{
+			//			SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[pos]);
+			//			break;
+			//		}
+			//		else
+			//			continue;
+			//		//else if (skip == true)
+			//		//{
+			//		//	skip = false;
+			//		//	//continue;
+			//		//}
+			//	}
 
 				//for (int r2 = adjRow1; r2 <= adjRow2 && found == false; ++r2)
 				//{
@@ -250,8 +252,87 @@ void SudokuSolver::CheckPossible(int row, int col)
 				//	SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[pos]);
 				//	return;
 				//}
-			}
 		}
 	}
+}
 
+void SudokuSolver::CheckPossibleRow(int row, int col)
+{
+	int adjRow1 = row - 1, adjRow2 = row + 1;
+	//int adjCol1 = col - 1, adjCol2 = col + 1;
+	for (int r = adjRow1; r <= adjRow2; ++r)
+	{
+		//for (int c = adjCol1; c <= adjCol2; ++c)
+		//{
+			
+			for (int c = 0; c < 9; ++c)
+			{
+				for (int i = 0; i < SudokuLevel[r][c].nvPossible.Size(); ++i)
+				{
+					bool found = false;
+					for (int c2 = 0; c2 < 9; ++c2)
+					{
+						if (c == c2)
+						{
+							continue;
+						}
+						for (int i2 = 0; i2 < SudokuLevel[r][c2].nvPossible.Size() && found == false; ++i2)
+						{
+							found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r][c2].nvPossible[i2];
+						}
+						if (found == true)
+						{
+							break;
+						}
+					}
+					if (found == false)
+					{
+						SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[i]);
+						//c = -1;
+						break;
+					}
+				}
+			}
+		//}
+	}
+}
+void SudokuSolver::CheckPossibleCol(int row, int col)
+{
+	//int adjRow1 = row - 1, adjRow2 = row + 1;
+	int adjCol1 = col - 1, adjCol2 = col + 1;
+	//for (int r = adjRow1; r <= adjRow2; ++r)
+	{
+		for (int c = adjCol1; c <= adjCol2; ++c)
+		{
+
+		for (int r = 0; r < 9; ++r)
+		{
+			for (int i = 0; i < SudokuLevel[r][c].nvPossible.Size(); ++i)
+			{
+				bool found = false;
+				for (int r2 = 0; r2 < 9; ++r2)
+				{
+					if (c == r2)
+					{
+						continue;
+					}
+					for (int i2 = 0; i2 < SudokuLevel[r2][c].nvPossible.Size() && found == false; ++i2)
+					{
+						found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r2][c].nvPossible[i2];
+					}
+					if (found == true)
+					{
+						break;
+					}
+				}
+				if (found == false)
+				{
+					SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[i]);
+					//c = -1;
+					break;
+				}
+			}
+		}
+		}
+	}
 }
