@@ -29,11 +29,16 @@ public:
 	void Print() const;
 	bool CompleteSudoku() const;
 	void RemoveExisting(int row, int col);
+	void RemoveExistingRow(int row, int col);
+	void RemoveExistingCol(int row, int col);
+	void RemoveExistingBox(int row, int col, int val);
 	void Solve();
 	void Update();
-	void CheckPossible(int row, int col);
-	void CheckPossibleRow(int row, int col);
-	void CheckPossibleCol(int row, int col);
+	//void CheckPossible(int row, int col);
+	bool CheckPossibleRow(int row, int col);
+	bool CheckPossibleCol(int row, int col);
+	bool CheckPossibleBox(int row, int col);
+
 private:
 	Cell SudokuLevel[9][9];
 };
