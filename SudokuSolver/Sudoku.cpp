@@ -85,21 +85,22 @@ void SudokuSolver::LoadSudokuLevel(const char* fileName)
 		}
 
 		//// level is loaded, take out exisitng values
-		for (int r = 0; r < 9; r++)
-		{
-			for (int c = 0; c < 9; c++)
-			{
-				RemoveExistingRow(r, c);
-				RemoveExistingCol(r, c);
-			}
-		}
-		//for (int startRow = 1; startRow < 9; startRow += 3)
+		//for (int r = 0; r < 9; r++)
 		//{
-		//	for (int startCol = 1; startCol < 9; startCol += 3)
+		//	for (int c = 0; c < 9; c++)
 		//	{
-		//		RemoveExistingBox(startRow, startCol);
+		//		RemoveExistingRow(r, c);
+		//		RemoveExistingCol(r, c);
+				for (int startRow = 1; startRow < 9; startRow += 3)
+				{
+					for (int startCol = 1; startCol < 9; startCol += 3)
+					{
+						RemoveExisting(startRow, startCol);
+					}
+				}
 		//	}
 		//}
+
 	}
 }
 void SudokuSolver::ResetCells()
@@ -127,8 +128,12 @@ void SudokuSolver::Print() const
 				cout << val;
 			}
 			cout << ' ';
+			if ((c+1) % 3 == 0)
+				cout << ' ';
 		}
 		cout << '\n';
+		if ((r+1) % 3 == 0)
+			cout << '\n';
 	}
 }
 bool SudokuSolver::CompleteSudoku() const
