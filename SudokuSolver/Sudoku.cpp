@@ -91,13 +91,13 @@ void SudokuSolver::LoadSudokuLevel(const char* fileName)
 		//	{
 		//		RemoveExistingRow(r, c);
 		//		RemoveExistingCol(r, c);
-				for (int startRow = 1; startRow < 9; startRow += 3)
-				{
-					for (int startCol = 1; startCol < 9; startCol += 3)
-					{
-						RemoveExisting(startRow, startCol);
-					}
-				}
+		for (int startRow = 1; startRow < 9; startRow += 3)
+		{
+			for (int startCol = 1; startCol < 9; startCol += 3)
+			{
+				RemoveExisting(startRow, startCol);
+			}
+		}
 		//	}
 		//}
 
@@ -128,11 +128,11 @@ void SudokuSolver::Print() const
 				cout << val;
 			}
 			cout << ' ';
-			if ((c+1) % 3 == 0)
+			if ((c + 1) % 3 == 0)
 				cout << ' ';
 		}
 		cout << '\n';
-		if ((r+1) % 3 == 0)
+		if ((r + 1) % 3 == 0)
 			cout << '\n';
 	}
 }
@@ -246,10 +246,19 @@ void SudokuSolver::Update()
 			{
 				RemoveNakedPairRow(nakedPairRow);//break;
 			}
-			
-			// handle naked pair col
 
+			// handle naked pair col
+			jhVector<SudokuIndex> nakedPairCol = FindNakedPairCol(startRow, startCol);
+			if (nakedPairCol.Size() == 2)
+			{
+				RemoveNakedPairCol(nakedPairCol);//break;
+			}
 			// handle naked pair box
+			jhVector<SudokuIndex> nakedPairBox = FindNakedPairBox(startRow, startCol);
+			if (nakedPairBox.Size() == 2)
+			{
+				RemoveNakedPairBox(nakedPairBox, startRow, startCol);//break;
+			}
 
 			//if (!CheckPossibleRow(startRow, startCol))
 			//CheckPossibleRow(startRow, startCol);
@@ -284,8 +293,8 @@ bool SudokuSolver::CheckPossibleBox(int row, int col)
 		for (int c = adjCol1; c <= adjCol2; ++c)
 		{
 
-		//for (int c = 0; c < 9; ++c)
-		//{
+			//for (int c = 0; c < 9; ++c)
+			//{
 			for (int i = 0; i < SudokuLevel[r][c].nvPossible.Size(); ++i)
 			{
 				//int ar1 = row - 1, ar2 = row + 1;
@@ -295,7 +304,7 @@ bool SudokuSolver::CheckPossibleBox(int row, int col)
 				{
 					for (int c2 = adjCol1; c2 <= adjCol2; ++c2)
 					{
-						
+
 						//for (int c2 = 0; c2 < 9; ++c2)
 						//{
 						if (c == c2 && r == r2)
@@ -327,7 +336,7 @@ bool SudokuSolver::CheckPossibleBox(int row, int col)
 					return true;
 				}
 			}
-		//}
+			//}
 
 		}
 	}
@@ -342,44 +351,44 @@ bool SudokuSolver::CheckPossibleRow(int row, int col)
 	{
 		//for (int c = adjCol1; c <= adjCol2; ++c)
 		//{
-			
-			for (int c = 0; c < 9; ++c)
+
+		for (int c = 0; c < 9; ++c)
+		{
+			for (int i = 0; i < SudokuLevel[r][c].nvPossible.Size(); ++i)
 			{
-				for (int i = 0; i < SudokuLevel[r][c].nvPossible.Size(); ++i)
+				bool found = false;
+				for (int c2 = 0; c2 < 9; ++c2)
 				{
-					bool found = false;
-					for (int c2 = 0; c2 < 9; ++c2)
+					if (c == c2)
 					{
-						if (c == c2)
+						continue;
+					}
+					if (SudokuLevel[r][c2].nvPossible.Size() > 0)
+					{
+						for (int i2 = 0; i2 < SudokuLevel[r][c2].nvPossible.Size() && found == false; ++i2)
 						{
-							continue;
-						}
-						if (SudokuLevel[r][c2].nvPossible.Size() > 0)
-						{
-							for (int i2 = 0; i2 < SudokuLevel[r][c2].nvPossible.Size() && found == false; ++i2)
-							{
-								found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r][c2].nvPossible[i2];
-							}
-						}
-						else
-						{
-							found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r][c2].nVal;
-						}
-						if (found == true)
-						{
-							break;
+							found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r][c2].nvPossible[i2];
 						}
 					}
-					if (found == false)
+					else
 					{
-						SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[i]);
-						RemoveExistingCol(r, c);
-						//c = -1;
-						return true;
+						found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r][c2].nVal;
+					}
+					if (found == true)
+					{
+						break;
 					}
 				}
+				if (found == false)
+				{
+					SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[i]);
+					RemoveExistingCol(r, c);
+					//c = -1;
+					return true;
+				}
 			}
-			
+		}
+
 		//}
 	}
 	return false;
@@ -393,42 +402,42 @@ bool SudokuSolver::CheckPossibleCol(int row, int col)
 		for (int c = adjCol1; c <= adjCol2; ++c)
 		{
 
-		for (int r = 0; r < 9; ++r)
-		{
-			for (int i = 0; i < SudokuLevel[r][c].nvPossible.Size(); ++i)
+			for (int r = 0; r < 9; ++r)
 			{
-				bool found = false;
-				for (int r2 = 0; r2 < 9; ++r2)
+				for (int i = 0; i < SudokuLevel[r][c].nvPossible.Size(); ++i)
 				{
-					if (c == r2)
+					bool found = false;
+					for (int r2 = 0; r2 < 9; ++r2)
 					{
-						continue;
-					}
-					if (SudokuLevel[r2][c].nvPossible.Size() > 0)
-					{
-						for (int i2 = 0; i2 < SudokuLevel[r2][c].nvPossible.Size() && found == false; ++i2)
+						if (c == r2)
 						{
-							found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r2][c].nvPossible[i2];
+							continue;
+						}
+						if (SudokuLevel[r2][c].nvPossible.Size() > 0)
+						{
+							for (int i2 = 0; i2 < SudokuLevel[r2][c].nvPossible.Size() && found == false; ++i2)
+							{
+								found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r2][c].nvPossible[i2];
+							}
+						}
+						else
+						{
+							found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r2][c].nVal;
+						}
+						if (found == true)
+						{
+							break;
 						}
 					}
-					else
+					if (found == false)
 					{
-						found = SudokuLevel[r][c].nvPossible[i] == SudokuLevel[r2][c].nVal;
+						SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[i]);
+						RemoveExistingRow(r, c);
+						//c = -1;
+						return true;
 					}
-					if (found == true)
-					{
-						break;
-					}
-				}
-				if (found == false)
-				{
-					SudokuLevel[r][c].CompleteCell(SudokuLevel[r][c].nvPossible[i]);
-					RemoveExistingRow(r, c);
-					//c = -1;
-					return true;
 				}
 			}
-		}
 		}
 	}
 	return false;
@@ -475,14 +484,87 @@ jhVector<SudokuSolver::SudokuIndex> SudokuSolver::FindNakedPairRow(int row, int 
 
 	return nakedHolder;
 }
-jhVector<SudokuSolver::SudokuIndex> SudokuSolver::FindNakedDoubleCol(int row, int col)
+jhVector<SudokuSolver::SudokuIndex> SudokuSolver::FindNakedPairCol(int row, int col)
 {
 	jhVector<SudokuIndex> nakedHolder;
+	//int adjRow1 = row - 1, adjRow2 = row + 1;
+	int adjCol1 = col - 1, adjCol2 = col + 1;
+
+	for (int c = adjCol1; c <= adjCol2; ++c)
+	{
+		for (int i = 0; i < 9; ++i)
+		{
+			if (SudokuLevel[i][c].nvPossible.Size() == 2)
+			{
+				for (int j = i + 1; j < 9; ++j)
+				{
+					if (SudokuLevel[j][c].nvPossible.Size() == 2)
+					{
+						bool foundPair = true;
+						for (int x = 0; x < SudokuLevel[i][c].nvPossible.Size(); ++x)
+						{
+							if (SudokuLevel[i][c].nvPossible[x] != SudokuLevel[j][c].nvPossible[x])
+							{
+								foundPair = false;
+								break;
+							}
+						}
+						if (foundPair == true)
+						{
+							SudokuIndex si1(i, c);
+							SudokuIndex si2(j, c);
+							nakedHolder.Append(si1);
+							nakedHolder.Append(si2);
+							return nakedHolder;
+						}
+					}
+				}
+			}
+		}
+	}
 	return nakedHolder;
 }
-jhVector<SudokuSolver::SudokuIndex> SudokuSolver::FindNakedDoubleBox(int row, int col)
+jhVector<SudokuSolver::SudokuIndex> SudokuSolver::FindNakedPairBox(int row, int col)
 {
 	jhVector<SudokuIndex> nakedHolder;
+	int adjRow1 = row - 1, adjRow2 = row + 1;
+	int adjCol1 = col - 1, adjCol2 = col + 1;
+	for (int r = adjRow1; r <= adjRow2; ++r)
+	{
+		for (int c = adjCol1; c <= adjCol2; ++c)
+		{
+			if (SudokuLevel[r][c].nvPossible.Size() == 2)
+			{
+				for (int r2 = adjRow1; r2 <= adjRow2; ++r2)
+				{
+					for (int c2 = adjCol1; c2 <= adjCol2; ++c2)
+					{
+						if (r2 == r && c2 == c) continue;
+						if (SudokuLevel[r2][c2].nvPossible.Size() == 2)
+						{
+							bool foundPair = true;
+							for (int x = 0; x < SudokuLevel[r][c].nvPossible.Size(); ++x)
+							{
+								if (SudokuLevel[r][c].nvPossible[x] != SudokuLevel[r2][c2].nvPossible[x])
+								{
+									foundPair = false;
+									break;
+								}
+							}
+							if (foundPair == true)
+							{
+								SudokuIndex si1(r, c);
+								SudokuIndex si2(r2, c2);
+								nakedHolder.Append(si1);
+								nakedHolder.Append(si2);
+								return nakedHolder;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	return nakedHolder;
 }
 
@@ -501,6 +583,46 @@ void SudokuSolver::RemoveNakedPairRow(jhVector<SudokuSolver::SudokuIndex> nakedH
 		for (int j = 0; j < SudokuLevel[row][col].nvPossible.Size(); ++j)
 		{
 			SudokuLevel[row][i].RemovePossible(SudokuLevel[row][col].nvPossible[j]);
+		}
+	}
+}
+
+void SudokuSolver::RemoveNakedPairCol(jhVector<SudokuSolver::SudokuIndex> nakedHolder)
+{
+	int row = nakedHolder[0].row;
+	int col = nakedHolder[0].col;
+
+	for (int i = 0; i < 9; ++i)
+	{
+		if (i == nakedHolder[0].row || i == nakedHolder[1].row)
+		{
+			continue;
+		}
+
+		for (int j = 0; j < SudokuLevel[row][col].nvPossible.Size(); ++j)
+		{
+			SudokuLevel[i][col].RemovePossible(SudokuLevel[row][col].nvPossible[j]);
+		}
+	}
+}
+void SudokuSolver::RemoveNakedPairBox(jhVector<SudokuSolver::SudokuIndex> nakedHolder, int row, int col)
+{
+	int adjRow1 = row - 1, adjRow2 = row + 1;
+	int adjCol1 = col - 1, adjCol2 = col + 1;
+	for (int r = adjRow1; r <= adjRow2; ++r)
+	{
+		for (int c = adjCol1; c <= adjCol2; ++c)
+		{
+			if ((r == nakedHolder[0].row && c == nakedHolder[0].col) || 
+				(r == nakedHolder[1].row && c == nakedHolder[1].col))
+			{
+				continue;
+			}
+
+			for (int i = 0; i < SudokuLevel[nakedHolder[0].row][nakedHolder[0].col].nvPossible.Size(); ++i)
+			{
+				SudokuLevel[r][c].RemovePossible(SudokuLevel[nakedHolder[0].row][nakedHolder[0].col].nvPossible[i]);
+			}
 		}
 	}
 }

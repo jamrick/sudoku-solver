@@ -49,10 +49,12 @@ public:
 	bool CheckPossibleBox(int row, int col);
 
 	jhVector<SudokuIndex> FindNakedPairRow(int row, int col);
-	jhVector<SudokuIndex> FindNakedDoubleCol(int row, int col);
-	jhVector<SudokuIndex> FindNakedDoubleBox(int row, int col);
+	jhVector<SudokuIndex> FindNakedPairCol(int row, int col);
+	jhVector<SudokuIndex> FindNakedPairBox(int row, int col);
 
 	void RemoveNakedPairRow(jhVector<SudokuIndex>);
+	void RemoveNakedPairCol(jhVector<SudokuIndex>);
+	void RemoveNakedPairBox(jhVector<SudokuIndex>, int, int);
 
 private:
 	Cell SudokuLevel[9][9];
