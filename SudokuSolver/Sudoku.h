@@ -21,6 +21,15 @@ private:
 		bool RemovePossible(int n);
 	};
 
+	struct SudokuIndex
+	{
+		int row, col;
+		SudokuIndex(int r = 0, int c = 0)
+		{
+			row = r; col = c;
+		}
+	};
+
 public:
 	SudokuSolver();
 	
@@ -38,6 +47,12 @@ public:
 	bool CheckPossibleRow(int row, int col);
 	bool CheckPossibleCol(int row, int col);
 	bool CheckPossibleBox(int row, int col);
+
+	jhVector<SudokuIndex> FindNakedPairRow(int row, int col);
+	jhVector<SudokuIndex> FindNakedDoubleCol(int row, int col);
+	jhVector<SudokuIndex> FindNakedDoubleBox(int row, int col);
+
+	void RemoveNakedPairRow(jhVector<SudokuIndex>);
 
 private:
 	Cell SudokuLevel[9][9];

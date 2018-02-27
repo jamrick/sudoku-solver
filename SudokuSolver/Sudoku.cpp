@@ -239,6 +239,18 @@ void SudokuSolver::Update()
 		for (int startCol = 1; startCol < 9; startCol += 3)
 		{
 			RemoveExisting(startRow, startCol);
+
+			// handle naked pair row
+			jhVector<SudokuIndex> nakedPairRow = FindNakedPairRow(startRow, startCol);
+			if (nakedPairRow.Size() == 2)
+			{
+				RemoveNakedPairRow(nakedPairRow);//break;
+			}
+			
+			// handle naked pair col
+
+			// handle naked pair box
+
 			//if (!CheckPossibleRow(startRow, startCol))
 			//CheckPossibleRow(startRow, startCol);
 			//	if (!CheckPossibleCol(startRow, startCol))
@@ -420,4 +432,75 @@ bool SudokuSolver::CheckPossibleCol(int row, int col)
 		}
 	}
 	return false;
+}
+
+jhVector<SudokuSolver::SudokuIndex> SudokuSolver::FindNakedPairRow(int row, int col)
+{
+	jhVector<SudokuIndex> nakedHolder;
+	int adjRow1 = row - 1, adjRow2 = row + 1;
+	//int adjCol1 = col - 1, adjCol2 = col + 1;
+
+	for (int r = adjRow1; r <= adjRow2; ++r)
+	{
+		for (int i = 0; i < 9; ++i)
+		{
+			if (SudokuLevel[r][i].nvPossible.Size() == 2)
+			{
+				for (int j = i + 1; j < 9; ++j)
+				{
+					if (SudokuLevel[r][j].nvPossible.Size() == 2)
+					{
+						bool foundPair = true;
+						for (int c = 0; c < SudokuLevel[r][i].nvPossible.Size(); ++c)
+						{
+							if (SudokuLevel[r][i].nvPossible[c] != SudokuLevel[r][j].nvPossible[c])
+							{
+								foundPair = false;
+								break;
+							}
+						}
+						if (foundPair == true)
+						{
+							SudokuIndex si1(r, i);
+							SudokuIndex si2(r, j);
+							nakedHolder.Append(si1);
+							nakedHolder.Append(si2);
+							return nakedHolder;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nakedHolder;
+}
+jhVector<SudokuSolver::SudokuIndex> SudokuSolver::FindNakedDoubleCol(int row, int col)
+{
+	jhVector<SudokuIndex> nakedHolder;
+	return nakedHolder;
+}
+jhVector<SudokuSolver::SudokuIndex> SudokuSolver::FindNakedDoubleBox(int row, int col)
+{
+	jhVector<SudokuIndex> nakedHolder;
+	return nakedHolder;
+}
+
+void SudokuSolver::RemoveNakedPairRow(jhVector<SudokuSolver::SudokuIndex> nakedHolder)
+{
+	int row = nakedHolder[0].row;
+	int col = nakedHolder[0].col;
+
+	for (int i = 0; i < 9; ++i)
+	{
+		if (i == nakedHolder[0].col || i == nakedHolder[1].col)
+		{
+			continue;
+		}
+
+		for (int j = 0; j < SudokuLevel[row][col].nvPossible.Size(); ++j)
+		{
+			SudokuLevel[row][i].RemovePossible(SudokuLevel[row][col].nvPossible[j]);
+		}
+	}
 }
