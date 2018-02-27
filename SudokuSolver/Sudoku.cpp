@@ -238,19 +238,26 @@ void SudokuSolver::Update()
 	{
 		for (int startCol = 1; startCol < 9; startCol += 3)
 		{
-			//RemoveExistingBox(startRow, startCol);
-			found1 = CheckPossibleRow(startRow, startCol);
+			RemoveExisting(startRow, startCol);
+			//if (!CheckPossibleRow(startRow, startCol))
+			//CheckPossibleRow(startRow, startCol);
+			//	if (!CheckPossibleCol(startRow, startCol))
+			//		
 			//if (found1)
+			//	return;
 			//{
 			//	//RemoveExisting(startRow, startCol);
 			//	break;
 			//}
 			//	
-			found1 = CheckPossibleCol(startRow, startCol);
+			//found1 = 
+			//CheckPossibleCol(startRow, startCol);//CheckPossibleBox(startRow, startCol);
 			//if (found1)
+			//	return;
 			//	break;
-			found1 = CheckPossibleBox(startRow, startCol);
+			/*found1 = *///CheckPossibleBox(startRow, startCol);
 			//if (found1)
+			//	return;
 			//	break;
 		}
 	}

@@ -7,6 +7,7 @@
 #include <iostream>
 #include "GameTimer.h"
 #include "Sudoku.h"
+#include <conio.h>
 
 /*PREPROCESSOR CONSTANTS*/
 #define BENCHMARKING false
@@ -29,6 +30,13 @@ int main()
 #else				// showing the solution as it happens with a short sleep between prints
 	while (!sudokuSolver.CompleteSudoku())
 	{
+		if (_kbhit())
+		{
+			if (_getch() == 'q')
+			{
+				break;
+			}
+		}
 		system("cls");
 		sudokuSolver.Update();
 		sudokuSolver.Print();
